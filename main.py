@@ -1,3 +1,5 @@
+import json
+
 from twisted.web import server, resource
 from twisted.internet import reactor
 
@@ -18,10 +20,12 @@ class PartyServer(resource.Resource):
     def render_GET(self, request):
         parh_array = request.path.decode('utf-8').split('/')
         controller_name = parh_array[1]
-        controller = PartyServer.CONTROLLERS[controller_name]
-        action = parh_array[2]
-
-        return controller.invoke(action, request.args).encode('utf-8')
+        controller = PartyServer.CONTROLLERS.get(controller_name)
+        if controller:
+            action = parh_array[2]
+            return controller.invoke(action, request.args).encode('utf-8')
+        else:
+            json.dumps({'errors': ['unknown_controller']})
 
 site = server.Site(PartyServer())
 reactor.listenTCP(8080, site)

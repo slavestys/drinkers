@@ -7,21 +7,30 @@ from drink import Drink
 
 class PartyController:
     party = Party()
+    errors = []
 
     @staticmethod
     def invoke(method, params):
         if method:
-            getattr(PartyController, method)(params)
+            try:
+                getattr(PartyController, method)(params)
+            except Exception as ex:
+                PartyController.errors.append(ex)
         return PartyController.to_client()
 
     @staticmethod
     def add_drinker(parameters):
-        drinker = Drinker(parameters[b'name'][0].decode('utf-8'), int(parameters[b'endurance'][0].decode('utf-8')))
+        name = parameters[b'name'][0].decode('utf-8')
+        endurance = int(parameters[b'endurance'][0].decode('utf-8'))
+        drinker = Drinker(name, endurance)
         PartyController.party.add_drinker(drinker)
 
     @staticmethod
     def add_drink(parameters):
-        drink = Drink(parameters[b'name'][0].decode('utf-8'), int(parameters[b'degrees'][0].decode('utf-8')), int(parameters[b'quantity'][0].decode('utf-8')))
+        name = parameters[b'name'][0].decode('utf-8')
+        degrees = int(parameters[b'degrees'][0].decode('utf-8'))
+        quantity = int(parameters[b'quantity'][0].decode('utf-8'))
+        drink = Drink(name, degrees, quantity)
         PartyController.party.add_drink(drink)
 
     @staticmethod
@@ -44,5 +53,8 @@ class PartyController:
         party_messages = PartyController.party.messages
         if party_messages:
             data['messages'] = party_messages
+        if PartyController.errors:
+            data['errors'] = PartyController.errors
+            PartyController.errors = []
         return json.dumps(data)
 
