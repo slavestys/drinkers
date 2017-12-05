@@ -10,26 +10,40 @@ class PartyController:
     errors = []
 
     @staticmethod
+    def prepare_parameter(parameters, name, cast_method = None):
+        list_value = parameters.get(name)
+        value = list_value[0].decode('utf-8') if list_value and len(list_value) > 0 else None
+        if not value:
+            raise ValueError("parameter {0} should be present".format(name.decode('utf-8')))
+
+        if cast_method:
+            try:
+                value = cast_method(value)
+            except Exception:
+                raise TypeError("parameter {0} has wrong type".format(name.decode('utf-8')))
+        return value
+
+    @staticmethod
     def invoke(method, params):
         if method:
             try:
                 getattr(PartyController, method)(params)
             except Exception as ex:
-                PartyController.errors.append(ex)
+                PartyController.errors.append(str(ex))
         return PartyController.to_client()
 
     @staticmethod
     def add_drinker(parameters):
-        name = parameters[b'name'][0].decode('utf-8')
-        endurance = int(parameters[b'endurance'][0].decode('utf-8'))
+        name = PartyController.prepare_parameter(parameters, b'name')
+        endurance = PartyController.prepare_parameter(parameters, b'endurance', int)
         drinker = Drinker(name, endurance)
         PartyController.party.add_drinker(drinker)
 
     @staticmethod
     def add_drink(parameters):
-        name = parameters[b'name'][0].decode('utf-8')
-        degrees = int(parameters[b'degrees'][0].decode('utf-8'))
-        quantity = int(parameters[b'quantity'][0].decode('utf-8'))
+        name = PartyController.prepare_parameter(parameters, b'name')
+        degrees = PartyController.prepare_parameter(parameters, b'degrees', int)
+        quantity = PartyController.prepare_parameter(parameters, b'quantity', int)
         drink = Drink(name, degrees, quantity)
         PartyController.party.add_drink(drink)
 

@@ -18,14 +18,15 @@ class PartyServer(resource.Resource):
     }
 
     def render_GET(self, request):
-        parh_array = request.path.decode('utf-8').split('/')
-        controller_name = parh_array[1]
-        controller = PartyServer.CONTROLLERS.get(controller_name)
+        path_array = request.path.decode('utf-8').split('/')
+        controller_name = path_array[1]
+        controller = PartyServer.CONTROLLERS.get(controller_name) if controller_name else PartyController
         if controller:
-            action = parh_array[2]
-            return controller.invoke(action, request.args).encode('utf-8')
+            action = path_array[2] if len(path_array) > 2 else None
+            result = controller.invoke(action, request.args)
         else:
-            json.dumps({'errors': ['unknown_controller']})
+            result = json.dumps({'errors': ['unknown_controller']})
+        return result.encode('utf-8')
 
 site = server.Site(PartyServer())
 reactor.listenTCP(8080, site)
