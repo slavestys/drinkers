@@ -22,7 +22,7 @@ class Drinker:
 
 
     def drink(self, drink_object):
-        if not self.state == Drinker.STATE_NORMAL:
+        if not (self.state == Drinker.STATE_NORMAL):
             return 0
         minimum = int(self.endurance / 4)
         maximum = int(self.endurance / 2)
@@ -33,6 +33,7 @@ class Drinker:
         quantity = int(endurance_quantity / drink_object.degrees)
         if drink_object.quantity < quantity:
             quantity = drink_object.quantity
+            endurance_quantity = quantity * drink_object.degrees
         drink_object.quantity -= quantity
         self.current_endurance -= endurance_quantity
 
