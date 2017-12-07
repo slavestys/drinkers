@@ -31,6 +31,7 @@ class Drinker:
             endurance_quantity = self.current_endurance
 
         quantity = int(endurance_quantity / drink_object.degrees)
+        endurance_quantity = quantity * drink_object.degrees
         if drink_object.quantity < quantity:
             quantity = drink_object.quantity
             endurance_quantity = quantity * drink_object.degrees

@@ -1,5 +1,7 @@
 import json
+import random
 
+from mock import patch
 from twisted.trial import unittest
 
 from test.support.dummy_site import DummySite
@@ -45,4 +47,27 @@ class ServerTest(unittest.TestCase):
             'state': 1
         })
         self.assertEqual(value, self.expect)
+
+    def test_party_hard(self):
+        self.web.get("/party/add_drink?name=whisky&degrees=40&quantity=400")
+        self.web.get("/party/add_drinker?name=misha&endurance=20000")
+        with patch('random.random') as random_mock:
+            random_mock.return_value = 0.9
+            response = self.web.get("/party/party_hard")
+        value = json.loads(response.value())
+        self.assertEqual(value['state'], Party.STATE_BAD_END)
+        self.assertEqual(value['drinks'], [])
+        self.assertEqual(value['drinkers'][0]['current_endurance'], 4000)
+
+        response = self.web.get("/party/party_clean")
+        value = json.loads(response.value())
+        self.assertEqual(value, self.expect)
+
+        self.web.get("/party/add_drink?name=whisky&degrees=40&quantity=400")
+        self.web.get("/party/add_drinker?name=misha&endurance=20000")
+        with patch('random.random') as random_mock:
+            random_mock.return_value = 0.1
+            response = self.web.get("/party/party_hard")
+        value = json.loads(response.value())
+        self.assertEqual(value['state'], Party.STATE_GOOD_END)
 

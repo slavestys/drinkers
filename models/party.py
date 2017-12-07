@@ -28,6 +28,12 @@ class Party:
         else:
             self.drinks = drinks
 
+    def clean(self):
+        self.state = Party.STATE_NORMAL
+        self.messages = []
+        self.drinkers = []
+        self.drinks = []
+
     def add_drinker(self, drinker):
         drinker.party = self
         self.drinkers.append(drinker)

@@ -52,6 +52,10 @@ class PartyController:
         PartyController.party.party_hard()
 
     @staticmethod
+    def party_clean(parameters):
+        PartyController.party.clean()
+
+    @staticmethod
     def to_client():
         drinkers_to_client = []
         for drinker in PartyController.party.drinkers:
