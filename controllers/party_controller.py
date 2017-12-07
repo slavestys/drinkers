@@ -1,8 +1,8 @@
 import json
 
-from party import Party
-from drinker import Drinker
-from drink import Drink
+from models.party import Party
+from models.drinker import Drinker
+from models.drink import Drink
 
 
 class PartyController:

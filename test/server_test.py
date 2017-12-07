@@ -2,15 +2,15 @@ import json
 
 from twisted.trial import unittest
 
-from support.dummy_site import DummySite
-from party_server import PartyServer
-from party_controller import PartyController
-from party import Party
+from test.support.dummy_site import DummySite
+from controllers.party_resource import PartyResource
+from controllers.party_controller import PartyController
+from models.party import Party
 
 
 class ServerTest(unittest.TestCase):
     def setUp(self):
-        self.web = DummySite(PartyServer)
+        self.web = DummySite(PartyResource)
         self.expect = {
             "drinkers": [],
             "drinks": [],

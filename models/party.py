@@ -1,5 +1,5 @@
 import random
-from drinker import Drinker
+from models.drinker import Drinker
 
 class Party:
     STATE_NORMAL = 1
