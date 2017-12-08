@@ -1,4 +1,7 @@
 import random
+import logging
+
+
 from models.drinker import Drinker
 
 class Party:
@@ -35,10 +38,12 @@ class Party:
         self.drinks = []
 
     def add_drinker(self, drinker):
+        logging.info('add drinker name {0} endurance {1}'.format(drinker.name, drinker.endurance))
         drinker.party = self
         self.drinkers.append(drinker)
 
     def add_drink(self, drink):
+        logging.info('add drink name {0} degrees {1} quantity {2}'.format(drink.name, drink.degrees, drink.quantity))
         self.drinks.append(drink)
 
     def tick(self):
@@ -63,6 +68,7 @@ class Party:
     def party_hard(self):
         iteration_number = 1
         self.messages.append('Party start')
+        logging.info('Party start')
         while self.state == Party.STATE_NORMAL:
             self.messages.append('Party hard {0}'.format(iteration_number))
             any_drinks = self.tick()
@@ -72,7 +78,9 @@ class Party:
                 else:
                     self.state = Party.STATE_BAD_END
             iteration_number += 1
-        self.messages.append('Party is over: {0}'.format(Party.STATE_NAMES[self.state]))
+        msg = 'Party is over: {0}'.format(Party.STATE_NAMES[self.state])
+        logging.info(msg)
+        self.messages.append(msg)
 
     def messages_to_client(self):
         if not self.messages:

@@ -1,0 +1,17 @@
+port: 8080
+
+logger: &basic_logger
+  version: 1
+  formatters:
+    party_formatter:
+      format: "%(asctime)s - %(levelname)s - %(message)s"
+  handlers: &basic_logger_handlers
+    file:
+      class : logging.handlers.RotatingFileHandler
+      formatter: party_formatter
+      filename: log/application.log
+      maxBytes: 1024
+      backupCount: 3
+  root: &basic_root_logger
+    handlers: [file]
+    level: DEBUG

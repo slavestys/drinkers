@@ -1,4 +1,5 @@
 import random
+import logging
 
 class Drinker:
     STATE_NORMAL = 1
@@ -38,7 +39,9 @@ class Drinker:
         drink_object.quantity -= quantity
         self.current_endurance -= endurance_quantity
 
-        self.party.messages.append('{0} drinks {1} grams of {2}'.format(self.name, quantity, drink_object.name))
+        msg = '{0} drinks {1} grams of {2}'.format(self.name, quantity, drink_object.name)
+        logging.info(msg)
+        self.party.messages.append(msg)
         self.try_change_state()
         return 1
 

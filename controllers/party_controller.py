@@ -1,4 +1,5 @@
 import json
+import logging
 
 from models.party import Party
 from models.drinker import Drinker
@@ -29,7 +30,9 @@ class PartyController:
             try:
                 getattr(PartyController, method)(params)
             except Exception as ex:
-                PartyController.errors.append(str(ex))
+                msg = str(ex)
+                logging.error(msg)
+                PartyController.errors.append(msg)
         return PartyController.to_client()
 
     @staticmethod

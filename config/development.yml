@@ -1,0 +1,14 @@
+#include application.yml
+
+logger:
+  <<: *basic_logger
+  handlers:
+    <<: *basic_logger_handlers
+    console:
+      class: logging.StreamHandler
+      formatter: party_formatter
+      level: DEBUG
+      stream: ext://sys.stdout
+  root:
+    <<: *basic_root_logger
+    handlers: [file, console]
