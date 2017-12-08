@@ -1,5 +1,6 @@
 import json
 import threading
+import logging
 
 from twisted.web import resource
 
@@ -15,6 +16,7 @@ class PartyResource(resource.Resource):
     }
 
     def render_GET(self, request):
+        logging.info('Request got: {0}'.format(request.uri))
         path_array = request.path.decode('utf-8').split('/')
         controller_name = path_array[1]
         controller = PartyResource.CONTROLLERS.get(controller_name) if controller_name else PartyController
@@ -23,5 +25,7 @@ class PartyResource(resource.Resource):
             with PartyResource.lock:
                 result = controller.invoke(action, request.args)
         else:
+            error = 'unknown_controller'
+            logging.error('unknown_controller')
             result = json.dumps({'errors': ['unknown_controller']})
         return result.encode('utf-8')
