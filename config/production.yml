@@ -1,0 +1,15 @@
+#include application.yml
+
+logger:
+  <<: *basic_logger
+  handlers:
+    <<: *basic_logger_handlers
+    rsyslog:
+      class: logging.handlers.SysLogHandler
+      formatter: party_formatter
+      level: DEBUG
+      address: '/dev/log'
+      facility: 'local5'
+  root:
+    <<: *basic_root_logger
+    handlers: [rsyslog]
