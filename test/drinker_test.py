@@ -6,9 +6,13 @@ from mock import patch
 from models.party import Party
 from models.drinker import Drinker
 from models.drink import Drink
+from test.support.test_helper import CleanUp
 
 
 class DrinkerTest(unittest.TestCase):
+
+    def setUp(self):
+        self.addCleanup(CleanUp.clean_up)
 
     def test_one_drink(self):
         party = Party()

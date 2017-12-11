@@ -1,0 +1,13 @@
+#include application.yml
+
+logger:
+  <<: *basic_logger
+  handlers:
+    <<: *basic_logger_handlers
+    file:
+      <<: *basic_file_handler
+      filename: ../log/application.log
+
+redis:
+  <<: *basic_redis
+  db: 15

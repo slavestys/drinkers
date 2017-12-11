@@ -7,8 +7,12 @@ from models.drink import Drink
 
 
 class PartyController:
-    party = Party()
-    errors = []
+
+    def __init__(self):
+        self.errors = []
+        self.party = Party.load()
+        if not self.party:
+            self.party = Party()
 
     @staticmethod
     def prepare_parameter(parameters, name, cast_method = None):
@@ -24,58 +28,41 @@ class PartyController:
                 raise TypeError("parameter {0} has wrong type".format(name.decode('utf-8')))
         return value
 
-    @staticmethod
-    def invoke(method, params):
+    def invoke(self, method, params):
         if method:
             try:
-                getattr(PartyController, method)(params)
+                getattr(self, method)(params)
+                if self.party.changed:
+                    self.party.save()
             except Exception as ex:
                 msg = str(ex)
                 logging.error(msg)
-                PartyController.errors.append(msg)
-        return PartyController.to_client()
+                self.errors.append(msg)
+        return self.to_client()
 
-    @staticmethod
-    def add_drinker(parameters):
+    def add_drinker(self, parameters):
         name = PartyController.prepare_parameter(parameters, b'name')
         endurance = PartyController.prepare_parameter(parameters, b'endurance', int)
         drinker = Drinker(name, endurance)
-        PartyController.party.add_drinker(drinker)
+        self.party.add_drinker(drinker)
 
-    @staticmethod
-    def add_drink(parameters):
+    def add_drink(self, parameters):
         name = PartyController.prepare_parameter(parameters, b'name')
         degrees = PartyController.prepare_parameter(parameters, b'degrees', int)
         quantity = PartyController.prepare_parameter(parameters, b'quantity', int)
         drink = Drink(name, degrees, quantity)
-        PartyController.party.add_drink(drink)
+        self.party.add_drink(drink)
 
-    @staticmethod
-    def party_hard(parameters):
-        PartyController.party.party_hard()
+    def party_hard(self, parameters):
+        self.party.party_hard()
 
-    @staticmethod
-    def party_clean(parameters):
-        PartyController.party.clean()
+    def party_clean(self, parameters):
+        self.party.clean()
 
-    @staticmethod
-    def to_client():
-        drinkers_to_client = []
-        for drinker in PartyController.party.drinkers:
-            drinkers_to_client.append(drinker.to_client())
-        drinks_to_client = []
-        for drink in PartyController.party.drinks:
-            drinks_to_client.append(drink.to_client())
-        data = {
-            'drinkers': drinkers_to_client,
-            'drinks': drinks_to_client,
-            'state': PartyController.party.state
-        }
-        party_messages = PartyController.party.messages
-        if party_messages:
-            data['messages'] = party_messages
-        if PartyController.errors:
-            data['errors'] = PartyController.errors
-            PartyController.errors = []
+    def to_client(self):
+        data = self.party.to_client()
+        if self.errors:
+            data['errors'] = self.errors
+            self.errors = []
         return json.dumps(data)
 

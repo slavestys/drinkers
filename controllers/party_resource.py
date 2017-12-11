@@ -21,11 +21,12 @@ class PartyResource(resource.Resource):
         controller_name = path_array[1]
         controller = PartyResource.CONTROLLERS.get(controller_name) if controller_name else PartyController
         if controller:
+            instance = controller()
             action = path_array[2] if len(path_array) > 2 else None
             with PartyResource.lock:
-                result = controller.invoke(action, request.args)
+                result = instance.invoke(action, request.args)
         else:
             error = 'unknown_controller'
-            logging.error('unknown_controller')
-            result = json.dumps({'errors': ['unknown_controller']})
+            logging.error(error)
+            result = json.dumps({'errors': [error]})
         return result.encode('utf-8')

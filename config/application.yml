@@ -6,7 +6,7 @@ logger: &basic_logger
     party_formatter:
       format: "%(asctime)s - %(levelname)s - %(message)s"
   handlers: &basic_logger_handlers
-    file:
+    file: &basic_file_handler
       class : logging.handlers.RotatingFileHandler
       formatter: party_formatter
       filename: log/application.log
@@ -15,3 +15,8 @@ logger: &basic_logger
   root: &basic_root_logger
     handlers: [file]
     level: DEBUG
+
+redis: &basic_redis
+  host: localhost
+  port: 6379
+  db: 14

@@ -1,11 +1,11 @@
 import json
 import threading
-from multiprocessing import Process
 
 from mock import patch
 from twisted.trial import unittest
 
 from test.support.dummy_site import DummySite
+from test.support.test_helper import CleanUp
 from controllers.party_resource import PartyResource
 from controllers.party_controller import PartyController
 from models.party import Party
@@ -19,6 +19,7 @@ class ServerTest(unittest.TestCase):
             "drinks": [],
             "state": 1
         }
+        self.addCleanup(CleanUp.clean_up)
 
     def tearDown(self):
         PartyController.party = Party()
@@ -85,14 +86,12 @@ class ServerTest(unittest.TestCase):
         thread = threading.Thread(target=clean_party)
 
         class PartyControllerMocked(PartyController):
-
-            @staticmethod
-            def mocked_invoke(method, parameters):
+            def mocked_invoke(self, method, parameters):
                 invoke_patch.stop()
                 thread.start()
-                return PartyController.invoke(method, parameters)
+                return self.invoke(method, parameters)
 
-        invoke_patch = patch.object(PartyController, 'invoke', wraps=PartyControllerMocked.mocked_invoke)
+        invoke_patch = patch.object(PartyController, 'invoke', new=PartyControllerMocked.mocked_invoke)
         invoke_patch.start()
         with patch('random.random') as random_mock:
             random_mock.return_value = 0.9

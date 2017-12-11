@@ -21,6 +21,13 @@ class Drinker:
         self.current_endurance = endurance
         self.state = Drinker.STATE_NORMAL
 
+    @classmethod
+    def from_redis(cls, data):
+        drinker = Drinker(data['name'], data['endurance'])
+        drinker.current_endurance = data['current_endurance']
+        drinker.state = data['state']
+        return drinker
+
 
     def drink(self, drink_object):
         if not (self.state == Drinker.STATE_NORMAL):

@@ -1,4 +1,7 @@
 import os
+import logging.config
+
+import redis
 
 from lib.yaml_extended import YamlExtended
 
@@ -6,17 +9,23 @@ from lib.yaml_extended import YamlExtended
 class Application:
     root_path = os.path.dirname(__file__) + '/'
     config_path = root_path + 'config/'
-    conf = None
+    config = None
+    redis = None
 
-    @staticmethod
-    def conf_path_by_name(name):
-        return Application.config_path + name
-
-    @staticmethod
-    def load_config():
+    @classmethod
+    def load_config(cls):
         conf_name = '{0}.yml'.format(os.environ.get('APP_ENV') or 'application')
-        Application.config = YamlExtended.load(conf_name, Application.config_path)
+        cls.config = YamlExtended.load(conf_name, cls.config_path)
 
-    @staticmethod
-    def port():
-        return Application.config['port']
+    @classmethod
+    def port(cls):
+        return cls.config['port']
+
+    @classmethod
+    def init(cls):
+        if cls.config:
+            return
+        cls.load_config()
+        redis_conf = cls.config['redis']
+        cls.redis = redis.StrictRedis(host=redis_conf['host'], port=redis_conf['port'], db=redis_conf['db'])
+        logging.config.dictConfig(Application.config['logger'])
